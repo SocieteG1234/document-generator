@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Lock } from 'lucide-react';
 
 // CODE DE SÉCURITÉ - MODIFIEZ ICI
-const SECURITY_CODE = '12345678'; // Changez ce code à 8 chiffres
+const SECURITY_CODE = '26082003'; // Changez ce code à 8 chiffres
 
 export default function Login({ onLogin }) {
   const [securityInput, setSecurityInput] = useState('');
