@@ -285,7 +285,7 @@ export default function TrainTicketGenerator() {
 
   if (currentView === 'users') {
     return (
-      <div className="min-h-screen bg-gray-50 p-2 sm:p-3">
+      <div className="bg-gray-50 p-2">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 mb-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
@@ -328,7 +328,7 @@ export default function TrainTicketGenerator() {
 
   if (currentView === 'tickets') {
     return (
-      <div className="min-h-screen bg-gray-50 p-2 sm:p-3">
+      <div className="bg-gray-50 p-2">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
@@ -378,7 +378,7 @@ export default function TrainTicketGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-2 sm:p-3">
+    <div className="bg-gray-50 p-2">
       <div className="max-w-5xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 mb-3">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">

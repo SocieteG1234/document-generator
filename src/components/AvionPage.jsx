@@ -297,7 +297,7 @@ export default function FlightTicketGenerator() {
 
   if (currentView === 'users') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 p-3 sm:p-4 md:p-6">
+      <div className="bg-gradient-to-br from-blue-50 to-sky-100 p-2">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 mb-4 sm:mb-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -347,7 +347,7 @@ export default function FlightTicketGenerator() {
 
   if (currentView === 'tickets') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 p-3 sm:p-4 md:p-6">
+      <div className="bg-gradient-to-br from-blue-50 to-sky-100 p-2">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -397,7 +397,7 @@ export default function FlightTicketGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-sky-100 p-3 sm:p-4 md:p-6">
+    <div className="bg-gradient-to-br from-blue-50 to-sky-100 p-2">
       <div className="max-w-5xl mx-auto">
         <div className="bg-white rounded-xl sm:rounded-2xl shadow-xl p-4 sm:p-6 mb-4 sm:mb-6">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
