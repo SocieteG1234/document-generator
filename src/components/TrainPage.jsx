@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Train, Download, User, Users, Save, FolderOpen, Edit2, Trash2 } from 'lucide-react';
+import { Train, Download, User, Users, Save, FolderOpen, Edit2, Trash2, Globe } from 'lucide-react';
 
 const loadJsPDF = () => {
   return new Promise((resolve, reject) => {
@@ -13,6 +13,49 @@ const loadJsPDF = () => {
     script.onerror = reject;
     document.head.appendChild(script);
   });
+};
+
+const TRANSLATIONS = {
+  fr: {
+    title: 'VOTRE E-BILLET',
+    subtitle: 'Nominatif, incessible, a presenter lors du controle',
+    departure: 'Depart',
+    arrival: 'Arriv.',
+    at: 'a',
+    from: 'de',
+    to: 'a',
+    car: 'VOITURE',
+    seat: 'PLACE ASSISE',
+    berth: 'COUCHETTE',
+    class: 'Classe',
+    name: 'Nom / Prenom',
+    file: 'Dossier',
+    clientRef: 'References client',
+    price: 'Prix',
+    conditions: 'PRIX ET ECHANGE SS CONDITIONS VALABLE SUR CE TRAIN       OFFREMETRO',
+    mandatory: 'Presence a quai obligatoire 2 mn avant depart',
+    ticketNum: 'N° e-billet'
+  },
+  it: {
+    title: 'IL TUO E-BIGLIETTO',
+    subtitle: 'Nominativo, non cedibile, da presentare al controllo',
+    departure: 'Partenza',
+    arrival: 'Arrivo',
+    at: 'alle',
+    from: 'da',
+    to: 'a',
+    car: 'CARROZZA',
+    seat: 'POSTO A SEDERE',
+    berth: 'CUCCETTA',
+    class: 'Classe',
+    name: 'Nome / Cognome',
+    file: 'Pratica',
+    clientRef: 'Riferimenti cliente',
+    price: 'Prezzo',
+    conditions: 'PREZZO E CAMBIO SOTTO CONDIZIONI VALIDO SU QUESTO TRENO    OFFREMETRO',
+    mandatory: 'Presenza obbligatoria al binario 2 min prima della partenza',
+    ticketNum: 'N° e-biglietto'
+  }
 };
 
 const PREDEFINED_USERS = [
@@ -41,6 +84,35 @@ const PREDEFINED_USERS = [
       clientRef: 'VG2909010990840010',
       ticketNumber: '8646423',
       dossier: 'OWNRWJ',
+      language: 'fr'
+    }
+  },
+  {
+    id: 'user2',
+    name: 'Marco Rossi',
+    data: {
+      trainOperator: 'Trenitalia',
+      routeName: 'ROMA TERMINI - MILANO CENTRALE',
+      passengerName: 'ROSSI MARCO',
+      departureDate: '15/01',
+      departureTime: '09H30',
+      departureStation: 'ROMA TERMINI',
+      arrivalTime: '12H45',
+      arrivalStation: 'MILANO CENTRALE',
+      trainNumber: 'FR 9615',
+      carNumber: '05',
+      carType: 'STD',
+      seatNumber: '12',
+      seatType: 'POSTO A SEDERE',
+      class: 'Classe 2',
+      ticketType: '01ADULTO',
+      price: '45.00',
+      currency: 'EUR',
+      bookingRef: '3001150145678',
+      clientRef: 'IT3001150145678020',
+      ticketNumber: '9876543',
+      dossier: 'MROSSI',
+      language: 'it'
     }
   },
 ];
@@ -48,6 +120,7 @@ const PREDEFINED_USERS = [
 export default function TrainTicketGenerator() {
   const [currentView, setCurrentView] = useState('users');
   const [selectedUser, setSelectedUser] = useState(null);
+  const [language, setLanguage] = useState('fr');
   const [formData, setFormData] = useState({
     trainOperator: '',
     routeName: '',
@@ -99,6 +172,7 @@ export default function TrainTicketGenerator() {
   const selectUser = (user) => {
     setSelectedUser(user);
     setFormData(user.data);
+    setLanguage(user.data.language || 'fr');
     setCurrentView('form');
   };
 
@@ -107,7 +181,7 @@ export default function TrainTicketGenerator() {
     const ticketData = {
       id: ticketId,
       date: new Date().toISOString(),
-      formData,
+      formData: { ...formData, language },
       name: `${formData.passengerName} - ${formData.departureStation} → ${formData.arrivalStation}`
     };
 
@@ -122,6 +196,7 @@ export default function TrainTicketGenerator() {
 
   const loadTicket = (ticket) => {
     setFormData(ticket.formData);
+    setLanguage(ticket.formData.language || 'fr');
     setCurrentView('form');
   };
 
@@ -144,6 +219,7 @@ export default function TrainTicketGenerator() {
   const generatePDF = async () => {
     try {
       const { jsPDF } = await loadJsPDF();
+      const t = TRANSLATIONS[language];
       
       const doc = new jsPDF({
         orientation: 'landscape',
@@ -161,21 +237,21 @@ export default function TrainTicketGenerator() {
       doc.setFontSize(14);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(0, 0, 0);
-      doc.text(formData.trainOperator || 'SNCF', 10, 15);
+      doc.text(formData.trainOperator, 10, 15);
 
       doc.setFontSize(12);
-      doc.text('VOTRE E-BILLET', 80, 15);
+      doc.text(t.title, 80, 15);
 
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
-      doc.text('Nominatif, incessible, à présenter lors du contrôle', 115, 15);
+      doc.text(t.subtitle, 115, 15);
 
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.5);
       doc.rect(10, 20, 150, 8);
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.text(formData.routeName || 'PARIS GARE LYON - MONTELIMAR SNCF', 12, 26);
+      doc.text(formData.routeName, 12, 26);
 
       doc.setFillColor(0, 0, 0);
       for (let i = 0; i < 15; i++) {
@@ -190,37 +266,48 @@ export default function TrainTicketGenerator() {
       
       doc.setFontSize(8);
       doc.setFont('helvetica', 'normal');
-      doc.text(`Départ ${formData.departureDate || '19/05'}à${formData.departureTime || '07H41'}de ${formData.departureStation || 'PARIS GARE LYON'}`, 50, yPos);
+      
+      const depText = t.departure + ' ' + formData.departureDate + ' ' + t.at + ' ' + formData.departureTime + ' ' + t.from + ' ' + formData.departureStation;
+      doc.text(depText, 50, yPos);
       
       yPos += 6;
-      doc.text(`Arriv.              à${formData.arrivalTime || '10H35'}à ${formData.arrivalStation || 'MONTELIMAR SNCF'}`, 50, yPos);
+      const arrText = t.arrival + '              ' + t.at + ' ' + formData.arrivalTime + ' ' + t.to + ' ' + formData.arrivalStation;
+      doc.text(arrText, 50, yPos);
 
       yPos += 8;
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.text(`${formData.trainNumber || 'TGV 6191'}`, 50, yPos);
+      doc.text(formData.trainNumber, 50, yPos);
 
       doc.setFont('helvetica', 'normal');
-      doc.text(`${formData.class || 'Classe 2'}`, 130, yPos);
+      doc.text(formData.class, 130, yPos);
 
       yPos += 8;
       doc.setFontSize(9);
-      doc.text(`VOITURE  ${formData.carNumber || '07'}  ${formData.carType || 'BAS'}`, 50, yPos);
-      doc.text(`${formData.seatType || 'PLACE ASSISE'}  ${formData.seatNumber || '4'}`, 100, yPos);
+      const seatTypeTranslated = formData.seatType === 'COUCHETTE' ? t.berth : t.seat;
+      const carText = t.car + '  ' + formData.carNumber + '  ' + formData.carType;
+      doc.text(carText, 50, yPos);
+      
+      const seatText = seatTypeTranslated + '  ' + formData.seatNumber;
+      doc.text(seatText, 100, yPos);
 
       yPos += 6;
       doc.setFontSize(6);
-      doc.text('PRIX ET ECHANGE SS CONDITIONS VALABLE SUR CE TRAIN       OFFREMETRO', 50, yPos);
+      doc.text(t.conditions, 50, yPos);
 
       yPos += 6;
       doc.setFontSize(8);
-      doc.text('Départ                à         de ***', 50, yPos);
+      if (formData.departureDate && formData.departureTime && formData.departureStation) {
+        doc.text(t.departure + '                ' + t.at + '         ' + t.from + ' ***', 50, yPos);
+      }
       yPos += 5;
-      doc.text('Arriv.                 à', 50, yPos);
+      if (formData.arrivalTime && formData.arrivalStation) {
+        doc.text(t.arrival + '                 ' + t.at, 50, yPos);
+      }
 
       yPos += 8;
       doc.setFontSize(9);
-      doc.text(`${formData.class || 'Classe 2'}  *`, 50, yPos);
+      doc.text(formData.class + '  *', 50, yPos);
 
       doc.setDrawColor(0, 0, 0);
       doc.line(165, 30, 165, 95);
@@ -228,20 +315,34 @@ export default function TrainTicketGenerator() {
       let yRight = 38;
       doc.setFontSize(8);
       doc.setFont('helvetica', 'bold');
-      doc.text('Nom / Prénom', 170, yRight);
+      doc.text(t.name, 170, yRight);
       
-      yRight += 10;
+      yRight += 5;
       doc.setFontSize(9);
-      doc.text(`Dossier  ${formData.dossier || 'OWNRWJ'}`, 170, yRight);
+      if (formData.passengerName) {
+        doc.text(formData.passengerName, 170, yRight);
+      }
+      
+      yRight += 8;
+      doc.setFontSize(8);
+      if (formData.dossier) {
+        doc.text(t.file + '  ' + formData.dossier, 170, yRight);
+      }
       
       yRight += 6;
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
-      doc.text('Références client', 170, yRight);
-      yRight += 4;
-      doc.text(formData.bookingRef || '2909010990840', 170, yRight);
-      yRight += 4;
-      doc.text(formData.clientRef || 'VG2909010990840010', 170, yRight);
+      if (formData.bookingRef || formData.clientRef) {
+        doc.text(t.clientRef, 170, yRight);
+        yRight += 4;
+        if (formData.bookingRef) {
+          doc.text(formData.bookingRef, 170, yRight);
+        }
+        yRight += 4;
+        if (formData.clientRef) {
+          doc.text(formData.clientRef, 170, yRight);
+        }
+      }
 
       yRight += 10;
       doc.setLineWidth(0.3);
@@ -249,13 +350,21 @@ export default function TrainTicketGenerator() {
       
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.text(formData.ticketType || '01ADULTE', 170, yRight + 3);
-      doc.text(formData.price || '36.00', 192, yRight + 3);
+      if (formData.ticketType) {
+        doc.text(formData.ticketType, 170, yRight + 3);
+      }
+      if (formData.price) {
+        doc.text(formData.price, 192, yRight + 3);
+      }
 
       yRight += 8;
       doc.line(168, yRight - 2, 200, yRight - 2);
-      doc.text(`Prix   ${formData.currency || 'EUR'}`, 170, yRight + 3);
-      doc.text(`**${formData.price || '36.00'}`, 186, yRight + 3);
+      if (formData.currency) {
+        doc.text(t.price + '   ' + formData.currency, 170, yRight + 3);
+      }
+      if (formData.price) {
+        doc.text('**' + formData.price, 186, yRight + 3);
+      }
 
       doc.setFillColor(0, 0, 0);
       for (let i = 0; i < 80; i++) {
@@ -269,23 +378,26 @@ export default function TrainTicketGenerator() {
 
       yPos = 98;
       doc.setFontSize(6);
-      doc.text('Présence à quai obligatoire 2 mn avant départ', 10, yPos);
-      doc.text(`N° e-billet  ${formData.ticketNumber || '8646423'}`, 150, yPos);
+      doc.text(t.mandatory, 10, yPos);
+      if (formData.ticketNumber) {
+        doc.text(t.ticketNum + '  ' + formData.ticketNumber, 150, yPos);
+      }
 
       doc.setFontSize(7);
       doc.text('CV', 194, 80);
 
-      doc.save(`E-Billet-Train-${formData.ticketNumber || 'Document'}.pdf`);
+      const filename = formData.ticketNumber ? 'E-Billet-Train-' + formData.ticketNumber + '.pdf' : 'E-Billet-Train.pdf';
+      doc.save(filename);
       
     } catch (error) {
-      console.error('Erreur lors de la génération du PDF:', error);
-      alert('❌ Erreur lors de la génération du PDF. Veuillez réessayer.');
+      console.error('Erreur lors de la generation du PDF:', error);
+      alert('❌ Erreur lors de la generation du PDF. Veuillez reessayer.');
     }
   };
 
   if (currentView === 'users') {
     return (
-      <div className="bg-gray-50 p-2">
+      <div className="bg-gray-50 p-2 min-h-screen">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 mb-3">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
@@ -302,20 +414,24 @@ export default function TrainTicketGenerator() {
               </button>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               {PREDEFINED_USERS.map((user) => (
                 <div
                   key={user.id}
                   onClick={() => selectUser(user)}
-                  className="p-3 sm:p-4 bg-gray-50 rounded-lg border-2 border-gray-300 hover:border-gray-500 cursor-pointer transition-all hover:shadow-md"
+                  className="p-3 sm:p-4 bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg border-2 border-gray-300 hover:border-blue-500 cursor-pointer transition-all hover:shadow-lg"
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <User className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+                    <User className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                     <h3 className="text-base sm:text-lg font-bold text-gray-800">{user.name}</h3>
+                    <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+                      {user.data.language === 'fr' ? '🇫🇷 FR' : '🇮🇹 IT'}
+                    </span>
                   </div>
-                  <div className="space-y-0.5 text-xs text-gray-600">
+                  <div className="space-y-1 text-xs text-gray-600">
                     <p><strong>Opérateur:</strong> {user.data.trainOperator}</p>
                     <p><strong>Route:</strong> {user.data.departureStation} → {user.data.arrivalStation}</p>
+                    <p><strong>Prix:</strong> {user.data.price} {user.data.currency}</p>
                   </div>
                 </div>
               ))}
@@ -328,7 +444,7 @@ export default function TrainTicketGenerator() {
 
   if (currentView === 'tickets') {
     return (
-      <div className="bg-gray-50 p-2">
+      <div className="bg-gray-50 p-2 min-h-screen">
         <div className="max-w-5xl mx-auto">
           <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-3">
@@ -350,7 +466,7 @@ export default function TrainTicketGenerator() {
                     <div className="flex-1 w-full sm:w-auto">
                       <p className="font-semibold text-sm break-words">{ticket.name}</p>
                       <p className="text-xs text-gray-500">
-                        {new Date(ticket.date).toLocaleDateString()}
+                        {new Date(ticket.date).toLocaleDateString('fr-FR')} • {ticket.formData.language === 'fr' ? '🇫🇷 Français' : '🇮🇹 Italien'}
                       </p>
                     </div>
                     <div className="flex gap-2 w-full sm:w-auto">
@@ -378,12 +494,12 @@ export default function TrainTicketGenerator() {
   }
 
   return (
-    <div className="bg-gray-50 p-2">
+    <div className="bg-gray-50 p-2 min-h-screen">
       <div className="max-w-5xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 mb-3">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <Train className="w-7 h-7 sm:w-8 sm:h-8 text-gray-700" />
+              <Train className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600" />
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-800">E-Billet Train</h1>
                 {selectedUser && <p className="text-xs text-gray-600">Utilisateur: {selectedUser.name}</p>}
@@ -414,6 +530,35 @@ export default function TrainTicketGenerator() {
           </div>
         </div>
 
+        <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 mb-3">
+          <div className="flex items-center gap-2 mb-3">
+            <Globe className="w-5 h-5 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">Langue du billet</h2>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setLanguage('fr')}
+              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition ${
+                language === 'fr'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              🇫🇷 Français
+            </button>
+            <button
+              onClick={() => setLanguage('it')}
+              className={`flex-1 px-4 py-2 rounded-lg font-semibold transition ${
+                language === 'it'
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+              }`}
+            >
+              🇮🇹 Italiano
+            </button>
+          </div>
+        </div>
+
         <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 mb-3 space-y-4">
           <div>
             <div className="flex items-center gap-2 mb-2">
@@ -421,8 +566,8 @@ export default function TrainTicketGenerator() {
               <h2 className="text-base sm:text-lg font-semibold text-gray-800">Opérateur</h2>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <input type="text" name="trainOperator" placeholder="Nom de l'opérateur" value={formData.trainOperator} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 text-sm" />
-              <input type="text" name="routeName" placeholder="Itinéraire" value={formData.routeName} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 text-sm" />
+              <input type="text" name="trainOperator" placeholder="Nom de l'opérateur" value={formData.trainOperator} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
+              <input type="text" name="routeName" placeholder="Itinéraire" value={formData.routeName} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
             </div>
           </div>
 
@@ -440,58 +585,58 @@ export default function TrainTicketGenerator() {
           <div>
             <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Trajet</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <input type="text" name="departureDate" placeholder="Date" value={formData.departureDate} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
-              <input type="text" name="departureTime" placeholder="Heure" value={formData.departureTime} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
-              <input type="text" name="departureStation" placeholder="Départ" value={formData.departureStation} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 col-span-2" />
-              <input type="text" name="arrivalTime" placeholder="Heure arrivée" value={formData.arrivalTime} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 col-span-2 sm:col-span-1 text-sm" />
-              <input type="text" name="arrivalStation" placeholder="Arrivée" value={formData.arrivalStation} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 col-span-2 sm:col-span-3 text-sm" />
+              <input type="text" name="departureDate" placeholder="Date (JJ/MM)" value={formData.departureDate} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
+              <input type="text" name="departureTime" placeholder="Heure (HHhMM)" value={formData.departureTime} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
+              <input type="text" name="departureStation" placeholder="Gare de départ" value={formData.departureStation} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 col-span-2" />
+              <input type="text" name="arrivalTime" placeholder="Heure (HHhMM)" value={formData.arrivalTime} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 col-span-2 sm:col-span-1 text-sm" />
+              <input type="text" name="arrivalStation" placeholder="Gare d'arrivée" value={formData.arrivalStation} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 col-span-2 sm:col-span-3 text-sm" />
             </div>
           </div>
 
           <div>
             <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Train & Place</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <input type="text" name="trainNumber" placeholder="Train" value={formData.trainNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm" />
+              <input type="text" name="trainNumber" placeholder="N° Train" value={formData.trainNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm" />
               <select name="class" value={formData.class} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm">
                 <option value="Classe 1">Classe 1</option>
                 <option value="Classe 2">Classe 2</option>
               </select>
-              <input type="text" name="carNumber" placeholder="Voiture" value={formData.carNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm" />
-              <input type="text" name="carType" placeholder="Type" value={formData.carType} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm" />
-              <select name="seatType" value={formData.seatType} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 col-span-2 text-sm">
-                <option value="PLACE ASSISE">Place Assise</option>
+              <input type="text" name="carNumber" placeholder="N° Voiture" value={formData.carNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm" />
+              <input type="text" name="carType" placeholder="Type (BAS/HAU)" value={formData.carType} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm" />
+              <input type="text" name="seatNumber" placeholder="N° Place" value={formData.seatNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm col-span-2 sm:col-span-1" />
+              <select name="seatType" value={formData.seatType} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 text-sm col-span-2 sm:col-span-1">
+                <option value="PLACE ASSISE">Place assise</option>
                 <option value="COUCHETTE">Couchette</option>
               </select>
-              <input type="text" name="seatNumber" placeholder="N° place" value={formData.seatNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 col-span-2 text-sm" />
             </div>
           </div>
 
           <div>
-            <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Tarif</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-800 mb-2">Tarif & Références</h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-              <select name="ticketType" value={formData.ticketType} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm">
-                <option value="01ADULTE">01 Adulte</option>
-                <option value="01ENFANT">01 Enfant</option>
-                <option value="01SENIOR">01 Senior</option>
+              <input type="text" name="ticketType" placeholder="Type billet" value={formData.ticketType} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" />
+              <input type="text" name="price" placeholder="Prix" value={formData.price} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" />
+              <select name="currency" value={formData.currency} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm">
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
               </select>
-              <input type="number" name="price" placeholder="Prix" value={formData.price} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm" />
-              <select name="currency" value={formData.currency} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 text-sm">
-                <option value="EUR">EUR (€)</option>
-                <option value="USD">USD ($)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="CHF">CHF</option>
-              </select>
-              <input type="text" name="bookingRef" placeholder="Référence" value={formData.bookingRef} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
-              <input type="text" name="clientRef" placeholder="Réf. client" value={formData.clientRef} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 sm:col-span-2 text-sm" />
-              <input type="text" name="ticketNumber" placeholder="N° e-billet" value={formData.ticketNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm" />
+              <input type="text" name="bookingRef" placeholder="Référence réservation" value={formData.bookingRef} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" />
+              <input type="text" name="clientRef" placeholder="Référence client" value={formData.clientRef} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" />
+              <input type="text" name="ticketNumber" placeholder="N° e-billet" value={formData.ticketNumber} onChange={handleChange} className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 text-sm" />
             </div>
           </div>
         </div>
 
-        <button onClick={generatePDF} className="w-full bg-gray-700 text-white py-2.5 rounded-lg font-semibold hover:bg-gray-800 transition-all flex items-center justify-center gap-2 shadow-lg text-sm">
-          <Download className="w-4 h-4" />
-          Télécharger l'E-Billet
-        </button>
+        <div className="bg-white rounded-lg shadow-lg p-4">
+          <button
+            onClick={generatePDF}
+            className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-md hover:shadow-lg font-bold text-lg"
+          >
+            <Download className="w-6 h-6" />
+            Générer le PDF
+          </button>
+        </div>
       </div>
     </div>
   );

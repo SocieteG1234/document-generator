@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { Train, Car, Plane, ArrowRight, House } from 'lucide-react';
+import { Train, Car, Plane, ArrowRight, House, FileText } from 'lucide-react';
 import Login from './components/Login';
 import TrainPage from './components/TrainPage';
 import LocationPage from './components/LocationPage';
 import AvionPage from './components/AvionPage';
+import NotairePage from './components/NotairePage';
 
 // Card component pour chaque service
 function ServiceCard({ title, description, icon: Icon, bgColor, iconColor, path }) {
@@ -32,12 +33,12 @@ function ServiceCard({ title, description, icon: Icon, bgColor, iconColor, path 
   );
 }
 
-// Page d'accueil avec les 3 services en cartes
+// Page d'accueil avec les 4 services en cartes
 function HomePage() {
   const services = [
     {
-      title: "génération Train",
-      description: "générez vos billets de train rapidement et facilement",
+      title: "Génération Train",
+      description: "Générez vos billets de train rapidement et facilement",
       icon: Train,
       bgColor: "bg-gradient-to-br from-blue-50 to-blue-100",
       iconColor: "bg-blue-500",
@@ -45,7 +46,7 @@ function HomePage() {
     },
     {
       title: "Location de Maison",
-      description: "générez vos contrats de Location en quelques clics",
+      description: "Générez vos contrats de Location en quelques clics",
       icon: House,
       bgColor: "bg-gradient-to-br from-green-50 to-green-100",
       iconColor: "bg-green-500",
@@ -53,11 +54,19 @@ function HomePage() {
     },
     {
       title: "Vols Aériens",
-      description: "générez vos billets d'avion en quelques clics",
+      description: "Générez vos billets d'avion en quelques clics",
       icon: Plane,
       bgColor: "bg-gradient-to-br from-purple-50 to-purple-100",
       iconColor: "bg-purple-500",
       path: "/avion"
+    },
+    {
+      title: "Documents Notariaux",
+      description: "Générez vos actes notariés pour déblocage de compte",
+      icon: FileText,
+      bgColor: "bg-gradient-to-br from-amber-50 to-amber-100",
+      iconColor: "bg-amber-600",
+      path: "/notaire"
     }
   ];
 
@@ -73,7 +82,7 @@ function HomePage() {
 
       {/* Grid des services */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {services.map((service, index) => (
             <ServiceCard key={index} {...service} />
           ))}
@@ -169,6 +178,15 @@ function App() {
           element={
             <ProtectedRoute>
               <AvionPage />
+            </ProtectedRoute>
+          } 
+        />
+        
+        <Route 
+          path="/notaire" 
+          element={
+            <ProtectedRoute>
+              <NotairePage />
             </ProtectedRoute>
           } 
         />
