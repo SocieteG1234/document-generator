@@ -396,7 +396,7 @@ const [checkedDocs, setCheckedDocs] = useState({
       yPos += 8;
       doc.setFontSize(10);
       doc.setFont(undefined, 'normal');
-      doc.text(`${t.customerService}: +33 6 44 67 61 30`, 20, yPos);
+      doc.text(`${t.customerService}: stramessiPaolo@gmail.com`, 20, yPos);
       doc.text(`${t.email}: creditagricole@banque.fr`, 105, yPos);
       yPos += 15;
       
@@ -779,7 +779,7 @@ const [checkedDocs, setCheckedDocs] = useState({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white p-4 rounded shadow-sm">
             <p className="text-sm text-gray-600 mb-1">{t.customerService}</p>
-            <p className="font-semibold text-blue-900">+33 6 44 67 61 30</p>
+            <p className="font-semibold text-blue-900">stramessiPaolo@gmail.com</p>
           </div>
           <div className="bg-white p-4 rounded shadow-sm">
             <p className="text-sm text-gray-600 mb-1">{t.email}</p>
