@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import { Train, Car, Plane, ArrowRight, House, FileText } from 'lucide-react';
+import { Train, Plane, ArrowRight, Home, FileText } from 'lucide-react';
 import Login from './components/Login';
 import TrainPage from './components/TrainPage';
 import LocationPage from './components/LocationPage';
 import AvionPage from './components/AvionPage';
 import NotairePage from './components/NotairePage';
+import BankDocument from './components/BankDocument';
 
 // Card component pour chaque service
 function ServiceCard({ title, description, icon: Icon, bgColor, iconColor, path }) {
@@ -33,7 +34,7 @@ function ServiceCard({ title, description, icon: Icon, bgColor, iconColor, path 
   );
 }
 
-// Page d'accueil avec les 4 services en cartes
+// Page d'accueil avec les services en cartes
 function HomePage() {
   const services = [
     {
@@ -47,7 +48,7 @@ function HomePage() {
     {
       title: "Location de Maison",
       description: "Générez vos contrats de Location en quelques clics",
-      icon: House,
+      icon: Home,
       bgColor: "bg-gradient-to-br from-green-50 to-green-100",
       iconColor: "bg-green-500",
       path: "/location"
@@ -67,6 +68,14 @@ function HomePage() {
       bgColor: "bg-gradient-to-br from-amber-50 to-amber-100",
       iconColor: "bg-amber-600",
       path: "/notaire"
+    },
+    {
+      title: "Documents Bancaires",
+      description: "Générez vos documents bancaires de formation",
+      icon: FileText,
+      bgColor: "bg-gradient-to-br from-indigo-50 to-indigo-100",
+      iconColor: "bg-indigo-600",
+      path: "/bank-document"
     }
   ];
 
@@ -82,7 +91,7 @@ function HomePage() {
 
       {/* Grid des services */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {services.map((service, index) => (
             <ServiceCard key={index} {...service} />
           ))}
@@ -190,9 +199,20 @@ function App() {
             </ProtectedRoute>
           } 
         />
+        
+        <Route 
+          path="/bank-document" 
+          element={
+            <ProtectedRoute>
+              <BankDocument />
+            </ProtectedRoute>
+          } 
+        />
       </Routes>
     </Router>
   );
 }
 
 export default App;
+
+

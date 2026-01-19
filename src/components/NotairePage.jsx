@@ -663,4 +663,4 @@ export default function NotairePage() {
       </div>
     </div>
   );
-}
+} 
